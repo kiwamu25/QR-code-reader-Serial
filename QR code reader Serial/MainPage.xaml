@@ -1,0 +1,62 @@
+﻿<Page
+    x:Class="QR_code_reader_Serial.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:QR_code_reader_Serial"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Border Background="DodgerBlue">
+            <TextBlock Text="Serial Reserver" Foreground="WhiteSmoke" HorizontalAlignment="Center" Padding="10"/>
+        </Border>
+
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid Background="LightBlue" Margin="10" CornerRadius="8">
+                <ListView ItemsSource="{x:Bind ViewModel.SerialDevices,Mode=OneWay}" ItemContainerStyle="{StaticResource StretchListViewItem}"
+                          SelectedItem="{x:Bind ViewModel.SelectedDevice ,Mode=TwoWay}" SelectionChanged="ListView_SelectionChanged"
+                      Padding="10" Margin="10" Header="Serial Port List" BorderBrush="SteelBlue" BorderThickness="3" CornerRadius="8">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="local:SerialDeviceItem">
+                            <Grid Background="SteelBlue" Margin="10,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Foreground="WhiteSmoke" FontSize="18" Padding="10,2" Text="{x:Bind PortName}"/>
+                                <TextBlock Grid.Column="1" Foreground="WhiteSmoke" VerticalAlignment="Center" Text="{x:Bind DeviceName}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+            <Button Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,15" Content="リスト再取得" Click="Button_Reload_Click"/>
+        </Grid>
+
+        <StackPanel Padding="20" BorderBrush="SteelBlue" BorderThickness="0,5,0,0" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+            <TextBlock Text="受信データ"/>
+            <TextBox Margin="10,2,10,10" Height="100" Text="{x:Bind ViewModel.ReadCode,Mode=OneWay}" IsReadOnly="True" AcceptsReturn="True"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="10" Grid.RowSpan="3" Background="LightSteelBlue"
+              Visibility="{x:Bind ViewModel.Reload,Mode=OneWay}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <ProgressRing Height="60" Width="60" Margin="50" IsActive="True"/>
+            <TextBlock Text="Serial devices loading."/>
+            </StackPanel>
+        </Grid>
+        
+    </Grid>
+</Page>
