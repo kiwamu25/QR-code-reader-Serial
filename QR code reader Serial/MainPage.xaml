@@ -54,14 +54,6 @@
             <TextBox Margin="10,2,10,10" Height="100" Text="{x:Bind ViewModel.ReadCode,Mode=OneWay}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"/>
         </StackPanel>
 
-        <!--<Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="10" Grid.RowSpan="3" Background="LightSteelBlue"
-              Visibility="{x:Bind ViewModel.Reload,Mode=OneWay}">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <ProgressRing Height="60" Width="60" Margin="50" IsActive="True"/>
-            <TextBlock Text="Serial devices loading."/>
-            </StackPanel>
-        </Grid>-->
-
         <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Margin="8" CornerRadius="8" Background="LightBlue">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -92,5 +84,15 @@
                 <Button Click="Button_Save_Click" Content="Save"/>
             </StackPanel>
         </Grid>
+
+
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="10" Grid.RowSpan="3" Background="LightSteelBlue"
+              Visibility="{x:Bind ViewModel.Reload,Mode=OneWay}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ProgressRing Height="60" Width="60" Margin="50" IsActive="True"/>
+                <TextBlock Text="Serial devices loading."/>
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </Page>
