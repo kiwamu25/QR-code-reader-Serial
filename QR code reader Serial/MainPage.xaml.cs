@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -10,7 +11,9 @@ using Windows.Devices.Enumeration;
 using Windows.Devices.SerialCommunication;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -88,6 +91,8 @@ namespace QR_code_reader_Serial
                         break;
                     case "\r":
                         ViewModel.ReadCode = ReadBuffer;
+                        var readcode = new ReadQRCode(ReadBuffer);
+                        ViewModel.ReadItems.Add(readcode);
                         ReadBuffer = string.Empty;
                         break;
                     default:
@@ -135,6 +140,45 @@ namespace QR_code_reader_Serial
             GetPorts();
         }
 
+        private async void Button_Save_Click(object sender ,RoutedEventArgs e)
+        {
+            var savePicker = new Windows.Storage.Pickers.FileSavePicker();
+            savePicker.SuggestedStartLocation =
+                Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+            savePicker.FileTypeChoices.Add("QRCodeList", new List<string>() { ".txt" });
+            savePicker.SuggestedFileName = "QRCode";
+
+            var message = string.Empty;
+            StorageFile file = await savePicker.PickSaveFileAsync();
+            if(file != null)
+            {
+                Windows.Storage.CachedFileManager.DeferUpdates(file);
+                var SaveData = string.Empty;
+                foreach(var item in ViewModel.ReadItems)
+                {
+                    SaveData += item.ReadString + "\n";
+                }
+                await Windows.Storage.FileIO.WriteTextAsync(file, SaveData);
+                Windows.Storage.Provider.FileUpdateStatus status =
+                    await Windows.Storage.CachedFileManager.CompleteUpdatesAsync(file);
+                if (status == Windows.Storage.Provider.FileUpdateStatus.Complete)
+                {
+                    
+                    message = "File " + file.Name + " was saved.";
+                }
+                else
+                {
+                    message = "File " + file.Name + " couldn't be saved.";
+                }
+            }
+            else
+            {
+                message = "Operation cancelled.";
+            }
+            await new MessageDialog(message).ShowAsync();
+
+        }
+
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             OpenSerial();
@@ -157,6 +201,20 @@ namespace QR_code_reader_Serial
                 this.PropertyChanged?.Invoke(this, SerialDevicesPropertyChangedEventArgs);
             }
         }
+
+        private static readonly PropertyChangedEventArgs ReadItemsPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(ReadItems));
+        private ObservableCollection<ReadQRCode> readItems = new ObservableCollection<ReadQRCode>();
+        public ObservableCollection<ReadQRCode> ReadItems
+        {
+            get { return this.readItems; }
+            set
+            {
+                if (this.readItems == value) { return; }
+                this.readItems = value;
+                this.PropertyChanged?.Invoke(this, ReadItemsPropertyChangedEventArgs);
+            }
+        }
+
 
         private static readonly PropertyChangedEventArgs SelectedDevicePropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(SelectedDevice));
         private SerialDeviceItem selectedDevice;
@@ -211,6 +269,38 @@ namespace QR_code_reader_Serial
             }
         }
 
+        public MainPageViewMode()
+        {
+            ReadItems.CollectionChanged += ReadItems_CollectionChanged;
+        }
+
+        private void ReadItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (ReadQRCode item in e.NewItems)
+                    item.PropertyChanged += DetailPropertyChanged;
+            }
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+            {
+                foreach (ReadQRCode item in e.OldItems)
+                    item.PropertyChanged -= DetailPropertyChanged;
+                foreach (ReadQRCode item in e.NewItems)
+                    item.PropertyChanged += DetailPropertyChanged;
+            }
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach (ReadQRCode item in e.OldItems)
+                    item.PropertyChanged -= DetailPropertyChanged;
+            }
+        }
+
+        private void DetailPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var ReadItem = sender as ReadQRCode;
+            if (ReadItem.IsRemove)
+                ReadItems.Remove(ReadItem);
+        }
     }
 
     public class SerialDeviceItem
@@ -218,6 +308,38 @@ namespace QR_code_reader_Serial
         public string PortName { get; set; }
         public string DeviceName { get; set; }
         public SerialDevice device { get; set; }
+    }
+
+
+    public class ReadQRCode : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        public string ReadString { get; set; }
+
+        private static readonly PropertyChangedEventArgs IsRemovePropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsRemove));
+        private bool isRemove;
+        public bool IsRemove
+        {
+            get { return this.isRemove; }
+            set
+            {
+                if (this.isRemove == value) { return; }
+                this.isRemove = value;
+                this.PropertyChanged?.Invoke(this, IsRemovePropertyChangedEventArgs);
+            }
+        }
+
+
+        public ReadQRCode(string ReadData)
+        {
+            ReadString = ReadData;
+        }
+
+        public void Button_Remove_Click(object sender ,RoutedEventArgs e)
+        {
+            IsRemove = true;
+        }
+
     }
 
 }

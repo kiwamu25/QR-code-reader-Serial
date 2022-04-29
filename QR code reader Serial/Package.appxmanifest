@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp">
 
 	<Identity
-	  Name="c335ceeb-7e76-48c6-84b4-6deaf7774d7e"
-	  Publisher="CN=kiwamu"
+	  Name="22289KiwamuIshigame.197270D066611"
+	  Publisher="CN=1921A50C-3F24-4A57-B178-E045C5000CA1"
 	  Version="1.0.0.0" />
 
-	<mp:PhoneIdentity PhoneProductId="c335ceeb-7e76-48c6-84b4-6deaf7774d7e" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+	<mp:PhoneIdentity PhoneProductId="85ef6b2e-3864-4451-88a8-597659bcacdb" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
 	<Properties>
-		<DisplayName>QR code reader Serial</DisplayName>
-		<PublisherDisplayName>kiwamu</PublisherDisplayName>
+		<DisplayName>QRCode Serial</DisplayName>
+		<PublisherDisplayName>Kiwamu Ishigame</PublisherDisplayName>
 		<Logo>Assets\StoreLogo.png</Logo>
 	</Properties>
 
@@ -32,12 +32,12 @@
 		  Executable="$targetnametoken$.exe"
 		  EntryPoint="QR_code_reader_Serial.App">
 			<uap:VisualElements
-			  DisplayName="QR code reader Serial"
+			  DisplayName="QRCode Serial"
 			  Square150x150Logo="Assets\Square150x150Logo.png"
 			  Square44x44Logo="Assets\Square44x44Logo.png"
-			  Description="QR code reader Serial"
+			  Description="市販のバーコードリーダーのシリアル通信で値を取得するツール。連続で読み込みテキストファイルに出力することも可能。"
 			  BackgroundColor="transparent">
-				<uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
+				<uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
 				<uap:SplashScreen Image="Assets\SplashScreen.png" />
 			</uap:VisualElements>
 		</Application>
